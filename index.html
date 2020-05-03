@@ -57,6 +57,7 @@
               @click="clickCheck(item.key)"
             />
             <label :for="typeId+item.key">{{item.showName || item.name}}</label>
+            <a v-show="item.urlshow" :href="item.url" target="_blank">試聽</a>
           </div>
         </div>
         <div class="hint" v-else>
@@ -144,6 +145,12 @@
                     name = `${name}(有贗品)`
                   }
                   item.showName = name
+                  if (item.urlvalue) {
+                    item.url = `https://animalcrossing.fandom.com/wiki/${item.urlvalue}`
+                    item.urlshow = true
+                  } else {
+                    item.urlshow = false
+                  }
                   return item
                 })
               }
