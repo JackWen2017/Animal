@@ -114,6 +114,10 @@ select {
   color: blue;
 }
 
+[v-cloak] {
+  display: none;
+}
+
 @media screen and (min-width: 768px) {
   .view {
     height: 200vh;
