@@ -11,37 +11,641 @@
     <h1>貓頭鷹博物館</h1>
     <div id="app" class="app">
       <div class="nav">
-        <div class="nav-btn">
-          <input type="button" value="全部" class="btn choose" />
-          <input type="button" value="已擁有" class="btn" />
-          <input type="button" value="未擁有" class="btn" />
+        <div class="nav-control">
+          <p class="title">類型:</p>
+          <select class="select" v-model="index.typeIndex">
+            <option :value="null">請選擇</option>
+            <option
+              v-for="(typeName,id) in typeList"
+              :key="typeName"
+              :value="id"
+            >
+              {{typeName}}
+            </option>
+          </select>
         </div>
         <div class="nav-control">
           <p class="title"><label for="name">查詢:</label></p>
-          <input id="name" type="text" placeholder="查詢條件" class="text" />
+          <input
+            id="name"
+            type="text"
+            placeholder="查詢條件"
+            class="text"
+            v-model.trim="filterString"
+          />
         </div>
-        <div class="nav-control">
-          <p class="title">類型:</p>
-          <select class="select">
-            <option value="">化石</option>
-            <option value="">CD</option>
-            <option value="">藝術品</option>
-          </select>
+        <div class="nav-btn">
+          <input
+            type="button"
+            class="btn"
+            v-for="(text,id) in btnValues"
+            :key="id"
+            :value="text"
+            :class="{choose:id===index.btnIndex}"
+            @click="changeBtn(id)"
+          />
         </div>
       </div>
       <div class="view">
-        <div class="list">
-          <div class="item">
-            <input type="checkbox" id="fossil1" class="checkbox" />
-            <label for="fossil1">三葉蟲</label>
+        <div class="list" v-if="showList !== null">
+          <div class="item" v-for="item in showList" :key="item.key">
+            <input
+              type="checkbox"
+              :id="typeId+item.key"
+              class="checkbox"
+              :checked="getCheckValue(item.key)"
+              @click="clickCheck(item.key)"
+            />
+            <label :for="typeId+item.key">{{item.name}}</label>
           </div>
-
-          <div class="item">
-            <input type="checkbox" id="fossil2" class="checkbox" checked />
-            <label for="fossil2">豐嬌昆明魚</label>
-          </div>
+        </div>
+        <div class="hint" v-else>
+          請選擇類型
         </div>
       </div>
     </div>
+
+    <script src="./assets/vue.js"></script>
+    <script src="./assets/axios.min.js"></script>
+
+    <script>
+      ;(async function() {
+        let saveData = { 0: [1, 2, 3], 1: [], 2: [], 3: [], 4: [] }
+
+        let items = [
+          {
+            id: 'fish',
+            name: '魚',
+            data: [
+              { key: 1, name: '紅目鯽', price: 900, place: '河川' },
+              { key: 2, name: '溪哥', price: 200, place: '河川' },
+              { key: 3, name: '鯽魚', price: 160, place: '河川' },
+              { key: 4, name: '珠星三塊魚', price: 240, place: '河川' },
+              { key: 5, name: '鯉魚', price: 300, place: '池塘' },
+              { key: 6, name: '錦鯉', price: 4000, place: '池塘' },
+              { key: 7, name: '金魚', price: 1300, place: '池塘' },
+              { key: 8, name: '龍睛金魚', price: 1300, place: '池塘' },
+              { key: 9, name: '蘭壽金魚', price: 4500, place: '池塘' },
+              { key: 10, name: '稻田魚', price: 300, place: '池塘' },
+              { key: 11, name: '淡水龍蝦', price: 200, place: '池塘' },
+              { key: 12, name: '鱉', price: 3750, place: '河川' },
+              { key: 13, name: '擬鱷龜', price: 5000, place: '河川' },
+              { key: 14, name: '蝌蚪', price: 100, place: '池塘' },
+              { key: 15, name: '青蛙', price: 120, place: '池塘' },
+              { key: 16, name: '塘鱧魚', price: 400, place: '河川' },
+              { key: 17, name: '泥鰍', price: 400, place: '河川' },
+              { key: 18, name: '鯰魚', price: 800, place: '池塘' },
+              { key: 19, name: '鱧魚', price: 5500, place: '池塘' },
+              { key: 20, name: '藍鰓太陽魚', price: 180, place: '河川' },
+              { key: 21, name: '黃鱸魚', price: 300, place: '河川' },
+              { key: 22, name: '黑鱸魚', price: 400, place: '河川' },
+              { key: 23, name: '吳郭魚', price: 800, place: '河川' },
+              { key: 24, name: '白斑狗魚', price: 1800, place: '河川' },
+              { key: 25, name: '西太公魚', price: 500, place: '河川' },
+              { key: 26, name: '香魚', price: 900, place: '河川' },
+              { key: 27, name: '櫻花鉤吻鮭', price: 1000, place: '懸崖上' },
+              { key: 28, name: '花羔紅點鮭', price: 3800, place: '懸崖上' },
+              { key: 29, name: '金鱒', price: 15000, place: '懸崖上' },
+              { key: 30, name: '遠東哲羅魚', price: 15000, place: '懸崖上' },
+              { key: 31, name: '鮭魚', price: 700, place: '出海口' },
+              { key: 32, name: '帝王鮭', price: 1800, place: '出海口' },
+              { key: 33, name: '中華絨螯蟹', price: 2000, place: '河川' },
+              { key: 34, name: '孔雀魚', price: 1300, place: '河川' },
+              { key: 35, name: '溫泉醫生魚', price: 1500, place: '河川' },
+              { key: 36, name: '神仙魚', price: 3000, place: '河川' },
+              { key: 37, name: '鬥魚', price: 2500, place: '河川' },
+              { key: 38, name: '霓虹燈魚', price: 500, place: '河川' },
+              { key: 39, name: '彩虹魚', price: 800, place: '河川' },
+              { key: 40, name: '食人魚', price: 2500, place: '河川' },
+              { key: 41, name: '骨舌魚', price: 10000, place: '河川' },
+              { key: 42, name: '黃金河虎', price: 15000, place: '河川' },
+              { key: 43, name: '雀鱔', price: 6000, place: '池塘' },
+              { key: 44, name: '巨骨舌魚', price: 10000, place: '河川' },
+              { key: 45, name: '恩氏多鰭魚', price: 4000, place: '河川' },
+              { key: 46, name: '鱘魚', price: 10000, place: '出海口' },
+              { key: 47, name: '海天使', price: 1000, place: '大海' },
+              { key: 48, name: '海馬', price: 1100, place: '大海' },
+              { key: 49, name: '小丑魚', price: 650, place: '大海' },
+              { key: 50, name: '擬刺尾鯛', price: 1000, place: '大海' },
+              { key: 51, name: '耳帶蝴蝶魚', price: 1000, place: '大海' },
+              { key: 52, name: '蘇眉魚', price: 10000, place: '大海' },
+              { key: 53, name: '獅子魚', price: 500, place: '大海' },
+              { key: 54, name: '河豚', price: 5000, place: '大海' },
+              { key: 55, name: '刺河豚', price: 250, place: '大海' },
+              { key: 56, name: '鳳尾魚', price: 200, place: '大海' },
+              { key: 57, name: '竹筴魚', price: 150, place: '大海' },
+              { key: 58, name: '條石鯛', price: 5000, place: '大海' },
+              { key: 59, name: '鱸魚', price: 400, place: '大海' },
+              { key: 60, name: '鯛魚', price: 3000, place: '大海' },
+              { key: 61, name: '鰈魚', price: 300, place: '大海' },
+              { key: 62, name: '比目魚', price: 800, place: '大海' },
+              { key: 63, name: '魷魚', price: 500, place: '大海' },
+              { key: 64, name: '裸胸鱔', price: 2000, place: '大海' },
+              { key: 65, name: '五彩鰻', price: 600, place: '大海' },
+              { key: 66, name: '鮪魚', price: 7000, place: '碼頭' },
+              { key: 67, name: '旗魚', price: 10000, place: '碼頭' },
+              { key: 68, name: '浪人鰺', price: 4500, place: '碼頭' },
+              { key: 69, name: '鬼頭刀', price: 6000, place: '碼頭' },
+              { key: 70, name: '翻車魚', price: 4000, place: '大海' },
+              { key: 71, name: '魟魚', price: 3000, place: '大海' },
+              { key: 72, name: '鋸鯊', price: 12000, place: '大海' },
+              { key: 73, name: '雙髻鯊', price: 8000, place: '大海' },
+              { key: 74, name: '鯊魚', price: 15000, place: '大海' },
+              { key: 75, name: '鯨鯊', price: 13000, place: '大海' },
+              { key: 76, name: '吸盤魚', price: 1500, place: '大海' },
+              { key: 77, name: '燈籠魚', price: 2500, place: '大海' },
+              { key: 78, name: '皇帶魚', price: 9000, place: '大海' },
+              { key: 79, name: '太平洋桶眼魚', price: 15000, place: '大海' },
+              { key: 80, name: '矛尾魚', price: 15000, place: '大海(雨天)' }
+            ]
+          },
+          {
+            id: 'insect',
+            name: '昆蟲',
+            data: [
+              { key: 1, name: '白粉蝶', price: 160, place: '綠地' },
+              { key: 2, name: '斑緣點粉蝶', price: 160, place: '綠地' },
+              { key: 3, name: '鳳蝶', price: 240, place: '綠地' },
+              { key: 4, name: '烏鴉鳳蝶', price: 2500, place: '綠地' },
+              { key: 5, name: '青帶鳳蝶', price: 300, place: '綠地' },
+              { key: 6, name: '大白斑蝶', price: 1000, place: '綠地' },
+              { key: 7, name: '大紫蛺蝶', price: 3000, place: '綠地' },
+              { key: 8, name: '大樺斑蝶', price: 140, place: '綠地' },
+              { key: 9, name: '大藍閃蝶', price: 4000, place: '綠地' },
+              { key: 10, name: '彩襖蛺蝶', price: 3000, place: '綠地' },
+              { key: 11, name: '紅頸鳳蝶', price: 2500, place: '綠地' },
+              { key: 12, name: '亞歷山大鳳蝶', price: 4000, place: '綠地' },
+              { key: 13, name: '飛蛾', price: 130, place: '戶外燈光' },
+              { key: 14, name: '皇蛾', price: 3000, place: '樹幹' },
+              { key: 15, name: '日落娥', price: 2500, place: '綠地' },
+              { key: 16, name: '中華劍角蝗', price: 200, place: '草地' },
+              { key: 17, name: '飛蝗', price: 600, place: '草地' },
+              { key: 18, name: '稻蝗', price: 400, place: '草地' },
+              { key: 19, name: '蚱蜢', price: 160, place: '草地' },
+              { key: 20, name: '蟋蟀', price: 130, place: '草地' },
+              { key: 21, name: '鈴蟲', price: 430, place: '草地' },
+              { key: 22, name: '螳螂', price: 430, place: '花朵上' },
+              { key: 23, name: '蘭花螳螂', price: 2400, place: '花朵上' },
+              { key: 24, name: '蜜蜂', price: 200, place: '花叢附近' },
+              { key: 25, name: '黃蜂', price: 2500, place: '搖晃或敲擊樹幹' },
+              { key: 26, name: '油蟬', price: 250, place: '樹幹(除椰子樹等)' },
+              {
+                key: 27,
+                name: '斑透翅蟬',
+                price: 300,
+                place: '樹幹(除椰子樹等)'
+              },
+              { key: 28, name: '熊蟬', price: 500, place: '樹幹(除椰子樹等)' },
+              { key: 29, name: '寒蟬', price: 400, place: '樹幹(除椰子樹等)' },
+              { key: 30, name: '暮蟬', price: 550, place: '樹幹(除椰子樹等)' },
+              { key: 31, name: '蟬蛻', price: 10, place: '樹幹(除椰子樹等)' },
+              { key: 32, name: '紅蜻蜓', price: 180, place: '水邊' },
+              { key: 33, name: '綠胸晏蜓', price: 230, place: '水邊' },
+              { key: 34, name: '無霸勾蜓', price: 4500, place: '水邊' },
+              { key: 35, name: '豆娘', price: 500, place: '水邊' },
+              { key: 36, name: '螢火蟲', price: 300, place: '淡水附近' },
+              { key: 37, name: '螻蛄', price: 500, place: '地面下' },
+              { key: 38, name: '水黽', price: 130, place: '池塘' },
+              { key: 39, name: '龍蝨', price: 800, place: '河川或池塘' },
+              { key: 40, name: '田鱉', price: 2000, place: '河川或池塘' },
+              { key: 41, name: '椿象', price: 120, place: '花朵上' },
+              { key: 42, name: '人面椿象', price: 1000, place: '花朵上' },
+              { key: 43, name: '瓢蟲', price: 200, place: '花朵上' },
+              { key: 44, name: '虎甲蟲', price: 1500, place: '草地' },
+              { key: 45, name: '吉丁蟲', price: 2400, place: '樹樁' },
+              { key: 46, name: '提琴蟲', price: 450, place: '樹樁' },
+              { key: 47, name: '星天牛', price: 350, place: '樹樁' },
+              { key: 48, name: '琉璃星天牛', price: 3000, place: '樹樁' },
+              { key: 49, name: '寶石象鼻蟲', price: 800, place: '樹幹' },
+              { key: 50, name: '糞金龜', price: 3000, place: '雪球附近出現' },
+              { key: 51, name: '雪隱金龜', price: 300, place: '草地' },
+              { key: 52, name: '寶石金龜', price: 10000, place: '樹幹' },
+              { key: 53, name: '日銅鑼花金龜', price: 200, place: '樹幹' },
+              { key: 54, name: '哥利亞大角花金龜', price: 8000, place: '樹幹' },
+              { key: 55, name: '鋸鍬形蟲', price: 2000, place: '樹幹' },
+              { key: 56, name: '深山鍬形蟲', price: 1000, place: '樹幹' },
+              { key: 57, name: '大鍬形蟲', price: 10000, place: '樹幹' },
+              { key: 58, name: '彩虹鍬形蟲', price: 6000, place: '樹幹' },
+              { key: 59, name: '細身赤鍬形蟲', price: 8000, place: '樹幹' },
+              { key: 60, name: '黃金鬼鍬形蟲', price: 12000, place: '樹幹' },
+              { key: 61, name: '長頸鹿鋸鍬形蟲', price: 12000, place: '樹幹' },
+              { key: 62, name: '獨角仙', price: 1350, place: '樹幹' },
+              {
+                key: 63,
+                name: '高卡薩斯南洋大兜蟲',
+                price: 8000,
+                place: '樹幹'
+              },
+              { key: 64, name: '象兜蟲', price: 8000, place: '樹幹' },
+              { key: 65, name: '長戟大兜蟲', price: 12000, place: '樹幹' },
+              { key: 66, name: '竹節蟲', price: 600, place: '樹幹' },
+              { key: 67, name: '葉竹隱蟲', price: 600, place: '樹下擬態葉片' },
+              { key: 68, name: '蓑衣蟲', price: 600, place: '搖晃或敲擊樹幹' },
+              { key: 69, name: '螞蟻', price: 80, place: '地面(腐爛大頭菜)' },
+              { key: 70, name: '寄居蟹', price: 1000, place: '沙灘' },
+              { key: 71, name: '海蟑螂', price: 200, place: '沙灘大岩石上' },
+              {
+                key: 72,
+                name: '蒼蠅',
+                price: 60,
+                place: '飛行(垃圾或腐爛大頭菜)'
+              },
+              { key: 73, name: '蚊子', price: 130, place: '隨機出現' },
+              { key: 74, name: '跳蚤', price: 70, place: '居民身上' },
+              { key: 75, name: '蝸牛', price: 250, place: '雨天石頭上' },
+              { key: 76, name: '鼠婦', price: 250, place: '石頭(敲擊)' },
+              { key: 77, name: '蜈蚣', price: 300, place: '石頭(敲擊)' },
+              { key: 78, name: '蜘蛛', price: 600, place: '搖晃或敲擊樹幹' },
+              { key: 79, name: '狼蛛', price: 8000, place: '地面' },
+              { key: 80, name: '蠍子', price: 8000, place: '地面' }
+            ]
+          },
+          {
+            id: 'fossil',
+            name: '化石',
+            data: [
+              { key: 1, name: '三葉蟲' },
+              { key: 2, name: '豐嬌昆明魚' },
+              { key: 3, name: '侏羅獸' },
+              { key: 4, name: '奇蝦' },
+              { key: 5, name: '始祖鳥' },
+              { key: 6, name: '棘螈' },
+              { key: 7, name: '琥珀' },
+              { key: 8, name: '菊石' },
+              { key: 9, name: '南方古猿' },
+              { key: 10, name: '恐龍腳印化石' },
+              { key: 11, name: '新翼魚' },
+              { key: 12, name: '糞化石' },
+              { key: 13, name: '鄧氏魚' },
+              { key: 14, name: '鯊魚牙齒' },
+              { key: 15, name: '梁龍頭部' },
+              { key: 16, name: '梁龍脖子' },
+              { key: 17, name: '梁龍胸部' },
+              { key: 18, name: '梁龍腰部' },
+              { key: 19, name: '梁龍尾巴' },
+              { key: 20, name: '梁龍尾端' },
+              { key: 21, name: '腕龍頭部' },
+              { key: 22, name: '腕龍胸部' },
+              { key: 23, name: '腕龍腰部' },
+              { key: 24, name: '腕龍尾巴' },
+              { key: 25, name: '三角龍頭部' },
+              { key: 26, name: '三角龍身體' },
+              { key: 27, name: '三角龍尾巴' },
+              { key: 28, name: '劍龍頭部' },
+              { key: 29, name: '劍龍身體' },
+              { key: 30, name: '劍龍尾巴' },
+              { key: 31, name: '副櫛龍頭部' },
+              { key: 32, name: '副櫛龍身體' },
+              { key: 33, name: '副櫛龍尾巴' },
+              { key: 34, name: '雙葉鈴木龍頭部' },
+              { key: 35, name: '雙葉鈴木龍身體' },
+              { key: 36, name: '雙葉鈴木龍尾巴' },
+              { key: 37, name: '巨角犀頭部' },
+              { key: 38, name: '巨角犀身體' },
+              { key: 39, name: '巨角犀尾巴' },
+              { key: 40, name: '無齒翼龍頭部' },
+              { key: 41, name: '無齒翼龍右翼' },
+              { key: 42, name: '無齒翼龍左翼' },
+              { key: 43, name: '暴龍頭部' },
+              { key: 44, name: '暴龍身體' },
+              { key: 45, name: '暴龍尾巴' },
+              { key: 46, name: '棘龍頭部' },
+              { key: 47, name: '棘龍身體' },
+              { key: 48, name: '棘龍尾巴' },
+              { key: 49, name: '甲龍頭部' },
+              { key: 50, name: '甲龍身體' },
+              { key: 51, name: '甲龍尾巴' },
+              { key: 52, name: '禽龍頭部' },
+              { key: 53, name: '禽龍身體' },
+              { key: 54, name: '禽龍尾巴' },
+              { key: 55, name: '風神翼龍頭部' },
+              { key: 56, name: '風神翼龍右翼' },
+              { key: 57, name: '風神翼龍左翼' },
+              { key: 58, name: '長毛象頭部' },
+              { key: 59, name: '長毛象身體' },
+              { key: 60, name: '帝龜頭部' },
+              { key: 61, name: '帝龜身體' },
+              { key: 62, name: '異齒龍頭部' },
+              { key: 63, name: '異齒龍身體' },
+              { key: 64, name: '恐爪龍頭部' },
+              { key: 65, name: '恐爪龍尾巴' },
+              { key: 66, name: '劍齒虎頭部' },
+              { key: 67, name: '劍齒虎身體' },
+              { key: 68, name: '大眼魚龍頭部' },
+              { key: 69, name: '大眼魚龍身體' },
+              { key: 70, name: '大角鹿右半身' },
+              { key: 71, name: '大角鹿左半身' },
+              { key: 72, name: '厚頭龍頭部' },
+              { key: 73, name: '厚頭龍身體' }
+            ]
+          },
+          {
+            id: 'kkcd',
+            name: 'KK音樂',
+            data: [
+              { key: 1, name: 'K.K.刑警', value: 'Agent_K.K.' },
+              { key: 2, name: '夏威夷K.K.', value: 'Aloha_K.K.' },
+              { key: 3, name: '動物城鎮', value: 'Animal_City' },
+              { key: 4, name: 'K.K.偶像', value: 'Bubblegum_K.K.' },
+              { key: 5, name: 'K.K.巴黎', value: 'Caf%C3%A9_K.K.' },
+              { key: 6, name: '昭和K.K.歌謠', value: 'Comrade_K.K.' },
+              { key: 7, name: '歐陸節拍', value: 'DJ_K.K._(song)' },
+              { key: 8, name: '兜風', value: 'Drivin%27' },
+              { key: 9, name: '再會', value: 'Farewell' },
+              { key: 10, name: '森林生活', value: 'Forest_Life' },
+              {
+                key: 11,
+                name: '沖吧！K.K.摩托車手',
+                value: 'Go_K.K._Rider',
+                has: false
+              },
+              { key: 12, name: '白日夢', value: 'Hypno_K.K.' },
+              { key: 13, name: '我愛你', value: 'I_Love_You' },
+              { key: 14, name: 'K.K.中華', value: 'Imperial_K.K.' },
+              {
+                key: 15,
+                name: 'K.K.好萊塢',
+                value: 'K.K._Adventure',
+                has: false
+              },
+              { key: 16, name: 'K.K.詠歎調', value: 'K.K._Aria' },
+              { key: 17, name: 'K.K.敘事歌謠', value: 'K.K._Ballad' },
+              { key: 18, name: 'K.K.吉普賽', value: 'K.K._Bazaar' },
+              { key: 19, name: '你的生日', value: 'K.K._Birthday' },
+              { key: 20, name: 'K.K.藍調', value: 'K.K._Blues' },
+              { key: 21, name: 'K.K.巴薩諾瓦', value: 'K.K._Bossa' },
+              {
+                key: 22,
+                name: 'K.K.卡利普索',
+                value: 'K.K._Calypso',
+                has: false
+              },
+              { key: 23, name: '土耳其樂曲', value: 'K.K._Casbah' },
+              {
+                key: 24,
+                name: 'K.K.讚美詩歌',
+                value: 'K.K._Chorale',
+                has: false
+              },
+              { key: 25, name: '秘魯之歌', value: 'K.K._Condor' },
+              { key: 26, name: 'K.K.鄉村', value: 'K.K._Country' },
+              { key: 27, name: '都市K.K.', value: 'K.K._Cruisin%27' },
+              { key: 28, name: '鼓打貝斯', value: 'K.K._D%26B' },
+              { key: 29, name: '驚悚歌', value: 'K.K._Dirge' },
+              { key: 30, name: 'K.K.迪斯可', value: 'K.K._Disco' },
+              { key: 31, name: 'K.K.迪克西', value: 'K.K._Dixie' },
+              {
+                key: 32,
+                name: 'K.K.練習曲',
+                value: 'K.K._%C3%89tude',
+                has: false
+              },
+              { key: 33, name: '沖繩K.K.', value: 'K.K._Faire' },
+              {
+                key: 34,
+                name: 'K.K.佛朗明哥',
+                value: 'K.K._Flamenco',
+                has: false
+              },
+              { key: 35, name: 'K.K.民謠', value: 'K.K._Folk' },
+              {
+                key: 36,
+                name: 'K.K.融合爵士樂',
+                value: 'K.K._Fusion',
+                has: false
+              },
+              { key: 37, name: 'K.K.律動', value: 'K.K._Groove' },
+              { key: 38, name: '新奧爾良樂曲', value: 'K.K._Gumbo' },
+              { key: 39, name: 'K.K.浩室', value: 'K.K._House' },
+              { key: 40, name: '動物島', value: 'K.K._Island' },
+              { key: 41, name: 'K.K.爵士樂', value: 'K.K._Jazz' },
+              { key: 42, name: 'K.K.三味線', value: 'K.K._Jongara' },
+              { key: 43, name: 'K.K.演歌', value: 'K.K._Lament' },
+              { key: 44, name: 'K.K.情歌', value: 'K.K._Love_Song' },
+              { key: 45, name: 'K.K.搖籃曲', value: 'K.K._Lullaby' },
+              { key: 46, name: 'K.K.曼波', value: 'K.K._Mambo' },
+              { key: 47, name: 'K.K.甘美朗', value: 'K.K._Marathon' },
+              { key: 48, name: 'K.K.進行曲', value: 'K.K._March' },
+              { key: 49, name: 'K.K.金屬搖滾', value: 'K.K._Metal' },
+              { key: 50, name: 'K.K.米隆加', value: 'K.K._Milonga' },
+              { key: 51, name: 'K.K.波蕾洛', value: 'K.K._Moody' },
+              { key: 52, name: 'K.K.印度王公', value: 'K.K._Oasis' },
+              { key: 53, name: 'K.K.嘉年華', value: 'K.K._Parade' },
+              {
+                key: 54,
+                name: '格拉泰姆音樂',
+                value: 'K.K._Ragtime',
+                has: false
+              },
+              { key: 55, name: 'K.K.大和祭典', value: 'K.K._Rally' },
+              { key: 56, name: 'K.K.雷鬼', value: 'K.K._Reggae' },
+              { key: 57, name: 'K.K.搖滾', value: 'K.K._Rock' },
+              {
+                key: 58,
+                name: 'K.K.鄉村搖滾',
+                value: 'K.K._Rockabilly',
+                has: false
+              },
+              { key: 59, name: 'K.K.非洲音樂', value: 'K.K._Safari' },
+              { key: 60, name: 'K.K.騷莎', value: 'K.K._Salsa' },
+              { key: 61, name: 'K.K.桑巴', value: 'K.K._Samba' },
+              { key: 62, name: 'K.K.斯卡', value: 'K.K._Ska' },
+              { key: 63, name: 'K.K.奏鳴曲', value: 'K.K._Sonata' },
+              { key: 64, name: 'K.K.樂曲', value: 'K.K._Song' },
+              { key: 65, name: 'K.K.靈魂樂', value: 'K.K._Soul' },
+              { key: 66, name: '哥薩克樂曲', value: 'K.K._Steppe' },
+              { key: 67, name: '散散步', value: 'K.K._Stroll' },
+              { key: 68, name: 'K.K.搖擺樂', value: 'K.K._Swing' },
+              { key: 69, name: 'K.K.電子民謠', value: 'K.K._Synth' },
+              { key: 70, name: 'K.K.探戈', value: 'K.K._Tango' },
+              { key: 71, name: '電音節奏', value: 'K.K._Technopop' },
+              { key: 72, name: 'K.K.圓舞曲', value: 'K.K._Waltz' },
+              { key: 73, name: 'K.K.西部', value: 'K.K._Western' },
+              { key: 74, name: 'K.K.領主', value: 'King_K.K.' },
+              { key: 75, name: '愛爾蘭樂曲', value: 'Lucky_K.K.' },
+              {
+                key: 76,
+                name: '船歌2001',
+                value: 'Marine_Song_2001',
+                has: false
+              },
+              {
+                key: 77,
+                name: '阿爾卑斯山樂曲',
+                value: 'Mountain_Song',
+                has: false
+              },
+              { key: 78, name: 'K.K.老師', value: 'Mr._K.K.' },
+              { key: 79, name: '我的歸所', value: 'My_Place' },
+              { key: 80, name: '義大利面', value: 'Neapolitan' },
+              { key: 81, name: '隻有我', value: 'Only_Me' },
+              { key: 82, name: '思考中', value: 'Pondering' },
+              {
+                key: 83,
+                name: 'K.K.50年代搖滾',
+                value: 'Rockin%27_K.K.',
+                has: false
+              },
+              {
+                key: 84,
+                name: '墨西哥紳士K.K.',
+                value: 'Se%C3%B1or_K.K.',
+                has: false
+              },
+              {
+                key: 85,
+                name: 'K.K.心靈音樂',
+                value: 'Soulful_K.K.',
+                has: false
+              },
+              { key: 86, name: '極簡音樂', value: 'Space_K.K.' },
+              { key: 87, name: '春暖花開', value: 'Spring_Blossoms' },
+              { key: 88, name: '藍色飯團', value: 'Stale_Cupcakes' },
+              { key: 89, name: '二段斜坡', value: 'Steep_Hill' },
+              {
+                key: 90,
+                name: '電吉他樂曲',
+                value: 'Surfin%27_K.K.',
+                has: false
+              },
+              { key: 91, name: 'K.K.放克', value: 'The_K._Funk' },
+              { key: 92, name: '漫彌', value: 'To_the_Edge' },
+              { key: 93, name: '前天', value: 'Two_Days_Ago' },
+              { key: 94, name: '流浪', value: 'Wandering' },
+              {
+                key: 95,
+                name: '大家集合吧',
+                value: 'Welcome_Horizons',
+                has: false
+              }
+            ]
+          },
+          {
+            id: 'artwork',
+            name: '藝術品',
+            data: [
+              { key: 1, name: '優美的名畫', hasfake: 'N' },
+              { key: 2, name: '端莊的名畫', hasfake: 'Y' },
+              { key: 3, name: '平靜的名畫', hasfake: 'Y' },
+              { key: 4, name: '勇敢的名畫', hasfake: 'Y' },
+              { key: 5, name: '有名的名畫', hasfake: 'Y' },
+              { key: 6, name: '厲害的名畫', hasfake: 'N' },
+              { key: 7, name: '婀娜的名畫', hasfake: 'Y' },
+              { key: 8, name: '漂亮的名畫', hasfake: 'Y' },
+              { key: 9, name: '動人的名畫', hasfake: 'Y' },
+              { key: 10, name: '舒適的名畫', hasfake: 'N' },
+              { key: 11, name: '磅礡的名畫', hasfake: 'N' },
+              { key: 12, name: '有趣的名畫', hasfake: 'Y' },
+              { key: 13, name: '常見的名畫', hasfake: 'N' },
+              { key: 14, name: '熱鬧的名畫', hasfake: 'N' },
+              { key: 15, name: '很好的名畫', hasfake: 'N' },
+              { key: 16, name: '珍貴的名畫', hasfake: 'N' },
+              { key: 17, name: '強健的名畫', hasfake: 'N' },
+              { key: 18, name: '驚人的名畫', hasfake: 'Y' },
+              { key: 19, name: '俊俏的名畫', hasfake: 'Y' },
+              { key: 20, name: '名貴的名畫', hasfake: 'N' },
+              { key: 21, name: '肅穆的名畫', hasfake: 'Y' },
+              { key: 22, name: '粗野的名畫右半邊', hasfake: 'Y' },
+              { key: 23, name: '和煦的名畫', hasfake: 'N' },
+              { key: 24, name: '充滿母愛的雕塑', hasfake: 'Y' },
+              { key: 25, name: '英挺的雕塑', hasfake: 'Y' },
+              { key: 26, name: '強壯的雕塑', hasfake: 'Y' },
+              { key: 27, name: '遠古的雕塑', hasfake: 'Y' },
+              { key: 28, name: '偉大的雕塑', hasfake: 'N' },
+              { key: 29, name: '美麗的雕塑', hasfake: 'Y' },
+              { key: 30, name: '神祕的雕塑', hasfake: 'Y' },
+              { key: 31, name: '神聖的雕塑', hasfake: 'Y' },
+              { key: 32, name: '石頭顱雕塑', hasfake: 'Y' },
+              { key: 33, name: '線索的雕塑', hasfake: 'Y' },
+              { key: 34, name: '出乎意料的雕塑', hasfake: 'Y' },
+              { key: 35, name: '武士的雕刻', hasfake: 'Y' },
+              { key: 36, name: '似曾相識的雕塑', hasfake: 'N' },
+              { key: 37, name: '粗野的名畫左半邊', hasfake: 'Y' },
+              { key: 38, name: '閃爍的名畫', hasfake: 'N' },
+              { key: 39, name: '學術性的名畫', hasfake: 'Y' },
+              { key: 40, name: '沉沒的名畫', hasfake: 'N' },
+              { key: 41, name: '細緻的名畫', hasfake: 'Y' },
+              { key: 42, name: '光線的名畫', hasfake: 'N' },
+              { key: 43, name: '神秘的名畫', hasfake: 'N' },
+              { key: 44, name: '優美的名畫', hasfake: 'N' }
+            ]
+          }
+        ]
+
+        new Vue({
+          el: '#app',
+          data: {
+            items,
+            index: {
+              typeIndex: null,
+              btnIndex: 0
+            },
+            checkboxData: {},
+            filterString: '',
+            btnValues: ['全部', '已捐贈', '未捐贈']
+          },
+          computed: {
+            typeList() {
+              return this.items.map(item => item.name)
+            },
+            typeId() {
+              let index = this.index.typeIndex
+              return index === null ? '' : this.items[index].id
+            },
+            itemList() {
+              let index = this.index.typeIndex
+              let data = index === null ? null : this.items[index].data
+              return data
+            },
+            filterList() {
+              let filter = this.filterString
+              let list = this.itemList
+              return filter
+                ? list.filter(item => item.name.indexOf(filter) >= 0)
+                : list
+            },
+            showList() {
+              let list = this.filterList
+              let index = this.index.btnIndex
+              if (list !== null && index !== 0) {
+                list = list.filter(
+                  item => (index === 1) === this.getCheckValue(item.key)
+                )
+              }
+              return list
+            }
+          },
+          methods: {
+            changeBtn(index) {
+              this.index.btnIndex = index
+            },
+            getCheckValue(key) {
+              return this.checkboxData[this.typeId][key]
+            },
+            clickCheck(key) {
+              let value = this.checkboxData[this.typeId][key]
+              let has = !value
+              this.checkboxData[this.typeId][key] = has
+              let keys = this.index.typeIndex
+              setSaveData(keys, key, has)
+            }
+          },
+          mounted() {
+            this.items.reduce((checkData, now, index) => {
+              let userData = saveData[index]
+              let dataHas = {}
+              let data = now.data
+              data.forEach(item => {
+                let key = item.key
+                let has = userData.indexOf(key) >= 0
+                dataHas[key] = has
+              })
+              let id = now.id
+              this.$set(this.checkboxData, id, dataHas)
+            }, {})
+          }
+        })
+      })()
+    </script>
   </body>
 </html>
