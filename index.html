@@ -47,8 +47,8 @@
         </div>
       </div>
       <div class="view">
-        <div class="list" v-if="showList !== null">
-          <div class="item" v-for="item in showList" :key="item.key">
+        <div class="list" v-if="showUserList !== null">
+          <div class="item" v-for="item in showUserList" :key="item.key">
             <input
               type="checkbox"
               :id="typeId+item.key"
@@ -130,6 +130,22 @@
                 list = list.filter(
                   item => (index === 1) === this.getCheckValue(item.key)
                 )
+              }
+              return list
+            },
+            showUserList() {
+              let list = this.showList
+              if (list !== null) {
+                list.map(item => {
+                  let name = item.name
+                  if (item.price) {
+                    name = `${name}($${item.price}/${item.place})`
+                  } else if (item.hasfake && item.hasfake === 'Y') {
+                    name = `${name}(有贗品)`
+                  }
+                  item.name = name
+                  return item
+                })
               }
               return list
             }
