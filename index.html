@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>貓頭鷹博物館</title>
+    <link rel="stylesheet" href="./assets/style.css" />
+  </head>
+  <body>
+    <h1>貓頭鷹博物館</h1>
+    <div id="app" class="app">
+      <div class="nav">
+        <div class="nav-btn">
+          <input type="button" value="全部" class="btn choose" />
+          <input type="button" value="已擁有" class="btn" />
+          <input type="button" value="未擁有" class="btn" />
+        </div>
+        <div class="nav-control">
+          <p class="title"><label for="name">查詢:</label></p>
+          <input id="name" type="text" placeholder="查詢條件" class="text" />
+        </div>
+        <div class="nav-control">
+          <p class="title">類型:</p>
+          <select class="select">
+            <option value="">化石</option>
+            <option value="">CD</option>
+            <option value="">藝術品</option>
+          </select>
+        </div>
+      </div>
+      <div class="view">
+        <div class="list">
+          <div class="item">
+            <input type="checkbox" id="fossil1" class="checkbox" />
+            <label for="fossil1">三葉蟲</label>
+          </div>
+
+          <div class="item">
+            <input type="checkbox" id="fossil2" class="checkbox" checked />
+            <label for="fossil2">豐嬌昆明魚</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

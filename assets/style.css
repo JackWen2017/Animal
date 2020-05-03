@@ -1,0 +1,124 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(58, 232, 255);
+}
+h1 {
+  text-align: center;
+}
+input,
+select {
+  border: none;
+  text-decoration: none;
+  border-radius: 6px;
+  height: 22px;
+  font-size: 14px;
+}
+.nav {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  background-color: rgb(80, 241, 215);
+  width: 95%;
+  border: 3px solid rgb(19, 10, 145);
+  border-radius: 10px 10px 0px 0px;
+  box-shadow: 2px 2px 5px cornflowerblue;
+  margin: auto;
+  margin-top: 5px;
+  padding: 7px 0;
+}
+
+.nav-btn {
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  border-radius: 10px;
+  background-color: rgb(15, 98, 175);
+  color: #fff;
+  font-weight: bold;
+  margin-left: 10px;
+}
+.btn:hover {
+  background-color: rgb(0, 162, 255);
+  color: #ff0;
+}
+
+.btn.choose {
+  background-color: rgb(4, 3, 75);
+  color: rgb(255, 251, 0);
+}
+
+.nav-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.text,
+.select {
+  margin-left: 5px;
+  margin-right: 5px;
+  width: 50%;
+}
+
+.view {
+  background: rgb(28, 206, 152);
+  border: 3px solid rgb(19, 10, 145);
+  border-top: 3px;
+  border-radius: 0px 0px 10px 10px;
+  box-shadow: 2px 2px 5px cornflowerblue;
+  width: 95%;
+  margin: auto;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  height: 100%;
+}
+
+.list {
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+}
+
+.item {
+  height: 10px;
+  font-size: 20px;
+  margin: 10px;
+  position: relative;
+}
+
+.item.hidden {
+  text-decoration: line-through rgb(139, 17, 17);
+}
+
+.checkbox {
+  height: 15px;
+  width: 15px;
+}
+
+.hint {
+  text-align: center;
+  font-size: 30px;
+  color: blue;
+}
+
+@media screen and (min-width: 768px) {
+  .view {
+    height: 200vh;
+  }
+  .list {
+    flex-wrap: wrap;
+  }
+}
