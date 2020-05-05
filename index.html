@@ -73,10 +73,13 @@
       ;(async function() {
         let preData = { 0: [], 1: [], 2: [], 3: [], 4: [] }
 
-        let saveData = JSON.parse(localStorage.getItem('saveData')) || preData
-        localStorage.removeItem('saveData')
+        let saveData = JSON.parse(localStorage.getItem('saveData')) || {}
+
+        let getValueByKey = function(obj, key) {
+          return obj.hasOwnProperty(key) ? obj[key] : []
+        }
         let setSaveData = function(key, value, has) {
-          let dataArray = saveData[key]
+          let dataArray = getValueByKey(saveData, key)
           let index = dataArray.indexOf(value)
           if (index < 0) {
             if (has) dataArray.push(value)
@@ -174,7 +177,7 @@
           },
           mounted() {
             this.items.reduce((checkData, now, index) => {
-              let userData = saveData[index]
+              let userData = getValueByKey(saveData, index)
               let dataHas = {}
               let data = now.data
               data.forEach(item => {
