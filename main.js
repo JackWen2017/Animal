@@ -1,5 +1,5 @@
 ;(async function() {
-  let saveData = JSON.parse(localStorage.getItem('saveData')) || []
+  let saveData = JSON.parse(localStorage.getItem('saveData')) || [{}]
   let saveDataObj = {}
   if (!Array.isArray(saveData)) {
     let oldSaveData = saveData
