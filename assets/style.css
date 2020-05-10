@@ -68,6 +68,12 @@ select {
   width: 50%;
 }
 
+.player {
+  margin-left: 5px;
+  margin-right: 5px;
+  width: 40%;
+}
+
 .view {
   background: rgb(28, 206, 152);
   border: 3px solid rgb(19, 10, 145);

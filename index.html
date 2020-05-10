@@ -12,6 +12,16 @@
     <div id="app" class="app" v-cloak>
       <div class="nav">
         <div class="nav-control">
+          <p class="title">角色:</p>
+          <select class="player" v-model="playIndexSelect">
+            <option v-for="playNo in player" :key="playNo" :value="playNo-1">
+              {{playNo}}P
+            </option>
+          </select>
+          <input type="button" class="btn" value="+" @click="addPlayer()" />
+          <input type="button" class="btn" value="-" @click="delPlayer()" />
+        </div>
+        <div class="nav-control">
           <p class="title">類型:</p>
           <select class="select" v-model="typeIndexSelect">
             <option :value="null">請選擇</option>

@@ -7,11 +7,13 @@
     saveData.push(oldSaveData)
   }
 
+  let player = saveData.length
+
   let getValueByKey = function(obj, key) {
     return obj.hasOwnProperty(key) ? obj[key] : []
   }
   let setSaveData = function(key, value, has, player) {
-    saveDataObj = saveData[player]
+    saveDataObj = saveData[player] || {}
     let dataArray = getValueByKey(saveDataObj, key)
     let index = dataArray.indexOf(value)
     if (index < 0) {
@@ -46,7 +48,8 @@
         groupIndex: 0
       },
       checkboxData: {},
-      filterString: ''
+      filterString: '',
+      player
     },
     computed: {
       typeList() {
@@ -87,6 +90,15 @@
       typeId() {
         let index = this.typeIndexSelect
         return index === null ? '' : this.items[index].id
+      },
+      playIndexSelect: {
+        get() {
+          return this.index.playIndex
+        },
+        set(index) {
+          this.index.playIndex = index
+          this.initCheckBox()
+        }
       },
       btnValues() {
         let btnValues = ['全部', '已捐贈', '未捐贈']
@@ -140,6 +152,21 @@
       }
     },
     methods: {
+      initCheckBox() {
+        let player = this.index.playIndex
+        this.items.reduce((checkData, now, index) => {
+          let userData = getValueByKey(saveData[player], index)
+          let dataHas = {}
+          let data = now.data
+          data.forEach(item => {
+            let key = item.key
+            let has = userData.indexOf(key) >= 0
+            dataHas[key] = has
+          })
+          let id = now.id
+          this.$set(this.checkboxData, id, dataHas)
+        }, {})
+      },
       changeBtn(index) {
         this.index.btnIndex = index
       },
@@ -171,21 +198,33 @@
         } else {
           item.urlshow = false
         }
+      },
+      addPlayer(changeNo) {
+        let playerNo = this.player
+        saveData[playerNo] = {}
+        this.player = playerNo + 1
+        window.localStorage.setItem('saveData', JSON.stringify(saveData))
+        this.playIndexSelect = playerNo
+        alert(`增加一位新Player:${playerNo + 1}P`)
+      },
+      delPlayer() {
+        if (this.player <= 1) {
+          alert('只剩一位角色，已不能刪除角色')
+          return
+        }
+        let nowPlayer = this.index.playIndex
+        if (confirm(`確定要刪除${nowPlayer + 1}P`)) {
+          saveData.splice(nowPlayer, 1)
+          let playerNo = this.player
+          this.player = playerNo - 1
+          window.localStorage.setItem('saveData', JSON.stringify(saveData))
+          this.playIndexSelect = 0
+          alert(`刪除現在${nowPlayer + 1}P (原本角色往前遞補)`)
+        }
       }
     },
     mounted() {
-      this.items.reduce((checkData, now, index) => {
-        let userData = getValueByKey(saveData[0], index)
-        let dataHas = {}
-        let data = now.data
-        data.forEach(item => {
-          let key = item.key
-          let has = userData.indexOf(key) >= 0
-          dataHas[key] = has
-        })
-        let id = now.id
-        this.$set(this.checkboxData, id, dataHas)
-      }, {})
+      this.initCheckBox()
     }
   })
 })()
