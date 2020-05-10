@@ -1,0 +1,136 @@
+;(async function() {
+  let saveData = JSON.parse(localStorage.getItem('saveData')) || []
+  let saveDataObj = {}
+  if (!Array.isArray(saveData)) {
+    let oldSaveData = saveData
+    saveData = []
+    saveData.push(oldSaveData)
+  }
+
+  let getValueByKey = function(obj, key) {
+    return obj.hasOwnProperty(key) ? obj[key] : []
+  }
+  let setSaveData = function(key, value, has, player) {
+    saveDataObj = saveData[player]
+    let dataArray = getValueByKey(saveDataObj, key)
+    let index = dataArray.indexOf(value)
+    if (index < 0) {
+      if (has) dataArray.push(value)
+    } else {
+      if (!has) dataArray.splice(index, 1)
+    }
+    saveDataObj[key] = dataArray
+    saveData[player] = saveDataObj
+    window.localStorage.setItem('saveData', JSON.stringify(saveData))
+  }
+
+  let items = await axios
+    .get('./assets/data.json')
+    .then(res => res.data)
+    .catch(() => [])
+
+  new Vue({
+    el: '#app',
+    data: {
+      items,
+      index: {
+        typeIndex: null,
+        btnIndex: 0,
+        playIndex: 0
+      },
+      checkboxData: {},
+      filterString: '',
+      btnValues: ['全部', '已捐贈', '未捐贈']
+    },
+    computed: {
+      typeList() {
+        return this.items.map(item => item.name)
+      },
+      typeId() {
+        let index = this.index.typeIndex
+        return index === null ? '' : this.items[index].id
+      },
+      itemList() {
+        let index = this.index.typeIndex
+        let data = index === null ? null : this.items[index].data
+        return data
+      },
+      filterList() {
+        let filter = this.filterString
+        let list = this.itemList
+        return filter
+          ? list.filter(item => item.name.indexOf(filter) >= 0)
+          : list
+      },
+      showList() {
+        let list = this.filterList
+        let index = this.index.btnIndex
+        if (list !== null && index !== 0) {
+          list = list.filter(
+            item => (index === 1) === this.getCheckValue(item.key)
+          )
+        }
+        return list
+      },
+      showUserList() {
+        let list = this.showList
+        if (list !== null) {
+          list.map(item => {
+            this.itemNameFilter(item)
+            this.itemUtlFilter(item)
+            return item
+          })
+        }
+        return list
+      }
+    },
+    methods: {
+      changeBtn(index) {
+        this.index.btnIndex = index
+      },
+      getCheckValue(key) {
+        return this.checkboxData[this.typeId][key]
+      },
+      clickCheck(key) {
+        let value = this.checkboxData[this.typeId][key]
+        let has = !value
+        this.checkboxData[this.typeId][key] = has
+        let keys = this.index.typeIndex
+        let player = this.index.playIndex
+        setSaveData(keys, key, has, player)
+      },
+      itemNameFilter(item) {
+        let info = ''
+        if (item.price) {
+          info = `($ ${item.price})`
+        }
+        if (item.hasfake && item.hasfake === 'Y') {
+          info = '(有贗品)'
+        }
+        item.showName = item.name + info
+      },
+      itemUtlFilter(item) {
+        if (item.urlvalue) {
+          item.url = `https://animalcrossing.fandom.com/wiki/${item.urlvalue}`
+          item.urlshow = true
+        } else {
+          item.urlshow = false
+        }
+      }
+    },
+    mounted() {
+      this.items.reduce((checkData, now, index) => {
+        let userData = getValueByKey(saveData[0], index)
+        let dataHas = {}
+        let data = now.data
+        data.forEach(item => {
+          let key = item.key
+          let has = userData.indexOf(key) >= 0
+          dataHas[key] = has
+        })
+        let id = now.id
+        this.$set(this.checkboxData, id, dataHas)
+      }, {})
+    }
+  })
+})()
