@@ -46,8 +46,7 @@
         groupIndex: 0
       },
       checkboxData: {},
-      filterString: '',
-      btnValues: ['全部', '已捐贈', '未捐贈']
+      filterString: ''
     },
     computed: {
       typeList() {
@@ -64,12 +63,16 @@
       },
       groupList() {
         let groupList = { 0: '全部' }
-        let index = this.index.typeIndex
+        let index = this.typeIndexSelect
+        let groups = {}
         if (index === 5) {
-          let diyGroup = this.group['diyGroup']
-          for (let groupKey in diyGroup) {
-            groupList[groupKey] = diyGroup[groupKey]
-          }
+          groups = this.group['diyGroup']
+        }
+        if (index === 6) {
+          groups = this.group['homeGroup']
+        }
+        for (let groupKey in groups) {
+          groupList[groupKey] = groups[groupKey]
         }
         return groupList
       },
@@ -82,11 +85,21 @@
         }
       },
       typeId() {
-        let index = this.index.typeIndex
+        let index = this.typeIndexSelect
         return index === null ? '' : this.items[index].id
       },
+      btnValues() {
+        let btnValues = ['全部', '已捐贈', '未捐贈']
+        let index = this.typeIndexSelect
+        if (index !== null) {
+          let hasName = this.items[index].hasName
+          btnValues[1] = `已${hasName}`
+          btnValues[2] = `未${hasName}`
+        }
+        return btnValues
+      },
       itemList() {
-        let index = this.index.typeIndex
+        let index = this.typeIndexSelect
         let data = index === null ? null : this.items[index].data
         return data
       },
@@ -137,7 +150,7 @@
         let value = this.checkboxData[this.typeId][key]
         let has = !value
         this.checkboxData[this.typeId][key] = has
-        let keys = this.index.typeIndex
+        let keys = this.typeIndexSelect
         let player = this.index.playIndex
         setSaveData(keys, key, has, player)
       },
