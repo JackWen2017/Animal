@@ -74,6 +74,40 @@ select {
   width: 40%;
 }
 
+.ctrl {
+  background: rgb(28, 206, 152);
+  border: 3px solid rgb(19, 10, 145);
+  border-top: 3px;
+  box-shadow: 2px 2px 5px cornflowerblue;
+  width: 95%;
+  margin: auto;
+  height: 100%;
+}
+
+.view-ctrl {
+  background-color: rgb(80, 169, 241);
+  position: relative;
+  height: 20px;
+}
+
+.view-ctrl::before {
+  content: '';
+  position: absolute;
+  height: 3px;
+  width: 36px;
+  background-color: #000;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  box-shadow: 0 4px 0 #000, 0 -4px 0 #000;
+}
+
+.view-ctrl-text {
+  display: none;
+}
+
 .view {
   background: rgb(28, 206, 152);
   border: 3px solid rgb(19, 10, 145);
@@ -120,11 +154,53 @@ select {
   color: blue;
 }
 
+.other {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
 [v-cloak] {
   display: none;
 }
 
+.slide-enter-to,
+.slide-leave {
+  overflow: hidden;
+  max-height: 100px;
+}
+
+.slide-enter,
+.slide-leave-to {
+  overflow: hidden;
+  max-height: 0;
+}
+
+.slide-enter-active {
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in;
+}
+
+.slide-leave-active {
+  transition-duration: 0.5s;
+  transition-timing-function: ease-out;
+}
+
 @media screen and (min-width: 768px) {
+  .view-ctrl::before {
+    content: '';
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0), 0 -4px 0 rgba(0, 0, 0, 0);
+  }
+
+  .view-ctrl-text {
+    font-weight: bold;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+  }
+
   .view {
     height: 500vh;
   }

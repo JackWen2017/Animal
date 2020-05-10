@@ -68,23 +68,38 @@
           />
         </div>
       </div>
-      <div class="view">
-        <div class="list" v-if="showUserList !== null">
-          <div class="item" v-for="item in showUserList" :key="item.key">
-            <input
-              type="checkbox"
-              :id="typeId+item.key"
-              class="checkbox"
-              :checked="getCheckValue(item.key)"
-              @click="clickCheck(item.key)"
-            />
-            <label :for="typeId+item.key">{{item.showName || item.name}}</label>
-            <a v-show="item.urlshow" :href="item.url" target="_blank">試聽</a>
+      <div class="ctrl">
+        <div class="view-ctrl" @click="showItem = !showItem">
+          <span class="view-ctrl-text"
+            >{{ showItem ? '隱藏' : '顯示' }}詳細資料</span
+          >
+        </div>
+      </div>
+      <transition name="slide">
+        <div class="view" v-show="showItem">
+          <div class="list" v-if="showUserList !== null">
+            <div class="item" v-for="item in showUserList" :key="item.key">
+              <input
+                type="checkbox"
+                :id="typeId+item.key"
+                class="checkbox"
+                :checked="getCheckValue(item.key)"
+                @click="clickCheck(item.key)"
+              />
+              <label :for="typeId+item.key"
+                >{{item.showName || item.name}}</label
+              >
+              <a v-show="item.urlshow" :href="item.url" target="_blank">試聽</a>
+            </div>
+          </div>
+          <div class="hint" v-else>
+            請選擇類型
           </div>
         </div>
-        <div class="hint" v-else>
-          請選擇類型
-        </div>
+      </transition>
+      <div class="other">
+        <input type="button" class="btn" value="下載存檔" />
+        <input type="button" class="btn" value="上傳存檔" />
       </div>
     </div>
 

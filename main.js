@@ -49,7 +49,8 @@
       },
       checkboxData: {},
       filterString: '',
-      player
+      player,
+      showItem: true
     },
     computed: {
       typeList() {
