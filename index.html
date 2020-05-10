@@ -13,7 +13,7 @@
       <div class="nav">
         <div class="nav-control">
           <p class="title">類型:</p>
-          <select class="select" v-model="index.typeIndex">
+          <select class="select" v-model="typeIndexSelect">
             <option :value="null">請選擇</option>
             <option
               v-for="(typeName,id) in typeList"
@@ -21,6 +21,18 @@
               :value="id"
             >
               {{typeName}}
+            </option>
+          </select>
+        </div>
+        <div class="nav-control">
+          <p class="title">分類:</p>
+          <select class="select" v-model="groupIndexSelect">
+            <option
+              v-for="(groupName,id,index) in groupList"
+              :key="groupName"
+              :value="id"
+            >
+              {{groupName}}
             </option>
           </select>
         </div>
@@ -66,7 +78,7 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
     <script src="./main.js"></script>
   </body>

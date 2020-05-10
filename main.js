@@ -29,14 +29,21 @@
     .then(res => res.data)
     .catch(() => [])
 
+  let group = await axios
+    .get('./assets/group.json')
+    .then(res => res.data)
+    .catch(() => [])
+
   new Vue({
     el: '#app',
     data: {
       items,
+      group,
       index: {
         typeIndex: null,
         btnIndex: 0,
-        playIndex: 0
+        playIndex: 0,
+        groupIndex: 0
       },
       checkboxData: {},
       filterString: '',
@@ -45,6 +52,34 @@
     computed: {
       typeList() {
         return this.items.map(item => item.name)
+      },
+      typeIndexSelect: {
+        get() {
+          return this.index.typeIndex
+        },
+        set(index) {
+          this.index.groupIndex = 0
+          this.index.typeIndex = index
+        }
+      },
+      groupList() {
+        let groupList = { 0: '全部' }
+        let index = this.index.typeIndex
+        if (index === 5) {
+          let diyGroup = this.group['diyGroup']
+          for (let groupKey in diyGroup) {
+            groupList[groupKey] = diyGroup[groupKey]
+          }
+        }
+        return groupList
+      },
+      groupIndexSelect: {
+        get() {
+          return this.index.groupIndex
+        },
+        set(index) {
+          this.index.groupIndex = parseInt(index)
+        }
       },
       typeId() {
         let index = this.index.typeIndex
@@ -55,9 +90,16 @@
         let data = index === null ? null : this.items[index].data
         return data
       },
+      groupFilterList() {
+        let groupIndex = this.index.groupIndex
+        let list = this.itemList
+        return groupIndex === 0
+          ? list
+          : list.filter(item => item.group && item.group === groupIndex)
+      },
       filterList() {
         let filter = this.filterString
-        let list = this.itemList
+        let list = this.groupFilterList
         return filter
           ? list.filter(item => item.name.indexOf(filter) >= 0)
           : list
