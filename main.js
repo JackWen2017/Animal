@@ -36,6 +36,8 @@
     .then(res => res.data)
     .catch(() => [])
 
+  let reader = new FileReader()
+
   new Vue({
     el: '#app',
     data: {
@@ -50,7 +52,8 @@
       checkboxData: {},
       filterString: '',
       player,
-      showItem: true
+      showItem: true,
+      saveData: ''
     },
     computed: {
       typeList() {
@@ -222,10 +225,45 @@
           this.playIndexSelect = 0
           alert(`刪除現在${nowPlayer + 1}P (原本角色往前遞補)`)
         }
+      },
+      downloadData() {
+        let saveDataJson = JSON.stringify(saveData)
+        this.saveData =
+          'data:text/json;charset=utf-8,' + encodeURIComponent(saveDataJson)
+      },
+      checkUploadData(uploadData) {
+        let result = ''
+        if (typeof uploadData === 'string') {
+          try {
+            let data = JSON.parse(uploadData)
+            result = data
+          } catch (error) {}
+        }
+        return result
+      },
+      fileLoadedHandler(e) {
+        let input = this.$refs.fileInput
+        input.type = 'text'
+        input.type = 'file'
+        let uploadData = e.target.result
+        let data = this.checkUploadData(uploadData)
+        if (Array.isArray(data)) {
+          this.player = data.length
+          saveData = data
+          this.playIndexSelect = 0
+          window.localStorage.setItem('saveData', JSON.stringify(saveData))
+          alert('讀取完成!!')
+        } else {
+          alert('請上傳正確存檔檔案')
+        }
+      },
+      fileHandler(e) {
+        reader.readAsText(e.target.files[0])
       }
     },
     mounted() {
       this.initCheckBox()
+      reader.onload = this.fileLoadedHandler
     }
   })
 })()

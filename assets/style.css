@@ -160,6 +160,12 @@ select {
   margin-top: 10px;
 }
 
+.other .btn {
+  text-decoration: none;
+  font-size: 14px;
+  padding: 3px 7px 1px 8px;
+}
+
 [v-cloak] {
   display: none;
 }

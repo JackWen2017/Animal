@@ -98,8 +98,25 @@
         </div>
       </transition>
       <div class="other">
-        <input type="button" class="btn" value="下載存檔" />
-        <input type="button" class="btn" value="上傳存檔" />
+        <a
+          class="btn"
+          @click="downloadData"
+          download="save.txt"
+          :href="saveData"
+          >下載存檔</a
+        >
+        <label class="btn">
+          <input
+            type="file"
+            class="btn"
+            accept=".txt"
+            value="上傳存檔"
+            ref="fileInput"
+            @change="fileHandler"
+            style="display:none;"
+          />
+          上傳圖片
+        </label>
       </div>
     </div>
 
