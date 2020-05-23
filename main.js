@@ -204,6 +204,10 @@
         }
       },
       addPlayer(changeNo) {
+        if (this.player === 4) {
+          alert('目前上限設定4位角色，不能再增加角色')
+          return
+        }
         let playerNo = this.player
         saveData[playerNo] = {}
         this.player = playerNo + 1
@@ -212,7 +216,7 @@
         alert(`增加一位新Player:${playerNo + 1}P`)
       },
       delPlayer() {
-        if (this.player <= 1) {
+        if (this.player === 1) {
           alert('只剩一位角色，已不能刪除角色')
           return
         }
